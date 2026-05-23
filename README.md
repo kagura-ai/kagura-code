@@ -71,9 +71,17 @@ if missing.
 
 ## Quick start
 
+> ⚠️ **PyPI publication is in progress** — see
+> [#6](https://github.com/kagura-ai/kagura-code/issues/6) for status.
+> Once published you'll be able to `pip install kagura-code` (or
+> `uv tool install kagura-code`). For now, install from GitHub:
+
 ```bash
-# 1. Install (not yet on PyPI — install from GitHub for now)
-pip install git+https://github.com/kagura-ai/kagura-code.git@v0.1.0a5
+# 1. Install (from GitHub until PyPI publication lands)
+pip install git+https://github.com/kagura-ai/kagura-code.git@v0.1.0a6
+# After PyPI is live, this becomes:
+#   pip install kagura-code
+#   # or: uv tool install kagura-code
 
 # 2. Verify environment
 kagura-code --doctor
@@ -84,14 +92,29 @@ kagura-code --list-models
 # 4. Launch a session (default: claude-deepseek-v4-pro, 1M context)
 kagura-code
 
-# Or pick a model explicitly:
-kagura-code --model claude-kimi-k2
+# Pick a model — positional shorthand or --model both work:
+kagura-code claude-kimi-k2
 kagura-code --model claude-qwen3-coder
 ```
 
 If `--doctor` reports a failed check, fix the underlying issue (install the
 missing binary, run `ollama serve`, run `ollama signin`, pull a cloud model)
 and re-run until all 9 checks pass.
+
+### Shell completion (optional)
+
+Tab-complete options/flags and configured model aliases:
+
+```bash
+kagura-code --install-completion bash   # or: zsh, fish, powershell
+# Restart your shell, then:
+kagura-code <TAB>                       # lists configured model aliases
+kagura-code --<TAB>                     # lists options
+```
+
+The model-alias completion reads your effective config (shipped defaults
++ `~/.config/kagura-code/config.toml` overrides), so custom aliases
+appear too.
 
 ## Configuration
 
@@ -120,7 +143,11 @@ Run `kagura-code --list-models` again to confirm the merged set.
 ## CLI reference
 
 ```
-kagura-code [OPTIONS] [-- claude-args...]
+kagura-code [OPTIONS] [MODEL_ARG] [-- claude-args...]
+
+Arguments:
+  [MODEL_ARG]               Model alias (positional shorthand).
+                            Overridden by --model if both are given.
 
 Options:
   -m, --model TEXT          Model alias to use (overrides default).
@@ -136,6 +163,10 @@ Options:
       --summarizer-model TEXT
                             LiteLLM alias used for compression (default: claude-qwen35-summ).
                             Pass "" to disable compression.
+      --install-completion [bash|zsh|fish|powershell|pwsh]
+                            Install shell completion (auto-detects shell if omitted).
+      --show-completion [bash|zsh|fish|powershell|pwsh]
+                            Print the completion script without installing.
   -V, --version             Show version and exit.
 
 Arguments after `--` are forwarded to the spawned `claude` process.

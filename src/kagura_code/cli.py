@@ -21,10 +21,19 @@ from .models import UnknownModelError, resolve_model
 from .proxy import ProxyManager
 from .signals import ShutdownCoordinator, install_handlers
 
+
+def _complete_model(incomplete: str) -> list[str]:
+    """Shell-completion callback: list model aliases matching the partial input."""
+    try:
+        cfg = load_config(explicit_path=None)
+    except ConfigError:
+        return []
+    return [m.alias for m in cfg.models if m.alias.startswith(incomplete)]
+
+
 app = typer.Typer(
     name="kagura-code",
     help="Run Claude Code CLI against non-Anthropic LLM backends (Ollama Cloud + more).",
-    add_completion=False,
     no_args_is_help=False,
 )
 
@@ -42,6 +51,11 @@ def _cache_dir() -> Path:
 @app.command(context_settings={"allow_extra_args": True, "ignore_unknown_options": True})
 def main(
     ctx: typer.Context,
+    model_arg: str | None = typer.Argument(
+        None,
+        help="Model alias (positional shorthand). Overridden by --model if both are given.",
+        autocompletion=_complete_model,
+    ),
     model: str | None = typer.Option(None, "--model", "-m", help="Model alias to use."),
     list_models: bool = typer.Option(
         False, "--list-models", help="List available models and exit."
@@ -97,8 +111,17 @@ def main(
         ok = run_diagnostics(cfg, router_model=router_model)
         raise typer.Exit(0 if ok else 1)
 
-    # Resolve model
-    selected_alias = model or cfg.default_model
+    # If the "positional" value actually looks like an option (starts with -),
+    # it's an unknown flag that click bound to model_arg because of
+    # ignore_unknown_options=True + the new Argument. Push it back into the
+    # forwarded args so `kagura-code --some-claude-flag` keeps working without
+    # requiring an explicit `--` separator (pre-positional-arg behavior).
+    if model_arg is not None and model_arg.startswith("-"):
+        ctx.args = [model_arg, *ctx.args]
+        model_arg = None
+
+    # Resolve model: explicit --model wins over positional, then config default.
+    selected_alias = model or model_arg or cfg.default_model
     try:
         spec = resolve_model(selected_alias, cfg.models)
     except UnknownModelError as e:

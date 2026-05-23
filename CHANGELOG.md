@@ -3,6 +3,28 @@
 All notable changes to this project will be documented here. The format
 follows [Keep a Changelog](https://keepachangelog.com/).
 
+## v0.1.0a6 — 2026-05-23
+
+**CLI ergonomics: positional model alias + shell completion; README PyPI
+"coming soon" banner.** (#7)
+
+`kagura-code claude-kimi-k2` now works as a shorthand for
+`kagura-code --model claude-kimi-k2`. If both forms are supplied,
+`--model` wins (explicit > positional), so existing scripts are
+unaffected.
+
+Shell completion is re-enabled (Typer's `add_completion=False` was
+dropped from the launcher). `kagura-code --install-completion bash`
+(or `zsh`/`fish`/`powershell`) writes the script. A custom completion
+callback walks the effective config and tab-completes configured model
+aliases — custom aliases from `~/.config/kagura-code/config.toml`
+appear too, since the callback runs `load_config()` at completion time.
+
+README "Quick start" gains a visible callout pointing to #6 for PyPI
+publication status, and the CLI reference grows entries for the new
+positional argument and the `--install-completion` / `--show-completion`
+options.
+
 ## v0.1.0a5 — 2026-05-23
 
 **Router timeout 5s → 15s; document auth-mode and status-bar trade-offs
