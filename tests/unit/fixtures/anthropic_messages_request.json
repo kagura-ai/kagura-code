@@ -1,0 +1,32 @@
+{
+  "model": "claude-deepseek-v4-pro",
+  "max_tokens": 8192,
+  "system": "You are Claude Code, Anthropic's official CLI for Claude.",
+  "tools": [
+    {"name": "Read", "description": "Reads a file from the local filesystem.", "input_schema": {"type": "object", "properties": {"file_path": {"type": "string"}}, "required": ["file_path"]}},
+    {"name": "Edit", "description": "Performs exact string replacements in files.", "input_schema": {"type": "object", "properties": {"file_path": {"type": "string"}, "old_string": {"type": "string"}, "new_string": {"type": "string"}}, "required": ["file_path", "old_string", "new_string"]}},
+    {"name": "Write", "description": "Writes a file to the local filesystem.", "input_schema": {"type": "object", "properties": {"file_path": {"type": "string"}, "content": {"type": "string"}}, "required": ["file_path", "content"]}},
+    {"name": "Bash", "description": "Executes a shell command.", "input_schema": {"type": "object", "properties": {"command": {"type": "string"}}, "required": ["command"]}},
+    {"name": "Glob", "description": "Glob for file patterns.", "input_schema": {"type": "object", "properties": {"pattern": {"type": "string"}}, "required": ["pattern"]}},
+    {"name": "Grep", "description": "Search file contents.", "input_schema": {"type": "object", "properties": {"pattern": {"type": "string"}}, "required": ["pattern"]}},
+    {"name": "Task", "description": "Spawn a subagent.", "input_schema": {"type": "object", "properties": {"description": {"type": "string"}, "prompt": {"type": "string"}, "subagent_type": {"type": "string"}}, "required": ["description", "prompt"]}},
+    {"name": "TodoWrite", "description": "Write todo items.", "input_schema": {"type": "object", "properties": {"todos": {"type": "array"}}, "required": ["todos"]}},
+    {"name": "WebFetch", "description": "Fetch a URL.", "input_schema": {"type": "object", "properties": {"url": {"type": "string"}, "prompt": {"type": "string"}}, "required": ["url", "prompt"]}},
+    {"name": "WebSearch", "description": "Web search.", "input_schema": {"type": "object", "properties": {"query": {"type": "string"}}, "required": ["query"]}},
+    {"name": "NotebookEdit", "description": "Edit a Jupyter notebook cell.", "input_schema": {"type": "object", "properties": {"notebook_path": {"type": "string"}}, "required": ["notebook_path"]}},
+    {"name": "NotebookRead", "description": "Read a Jupyter notebook.", "input_schema": {"type": "object", "properties": {"notebook_path": {"type": "string"}}, "required": ["notebook_path"]}},
+    {"name": "ExitPlanMode", "description": "Exit plan mode and begin implementation.", "input_schema": {"type": "object", "properties": {}}},
+    {"name": "BashOutput", "description": "Stream bash command output.", "input_schema": {"type": "object", "properties": {"output": {"type": "string"}}, "required": ["output"]}},
+    {"name": "KillShell", "description": "Kill a running shell process.", "input_schema": {"type": "object", "properties": {"pid": {"type": "integer"}}, "required": ["pid"]}},
+    {"name": "Skill", "description": "Execute a skill.", "input_schema": {"type": "object", "properties": {"skill": {"type": "string"}}, "required": ["skill"]}},
+    {"name": "AskUserQuestion", "description": "Ask the user a question.", "input_schema": {"type": "object", "properties": {"questions": {"type": "array"}}, "required": ["questions"]}},
+    {"name": "mcp__github__create_issue", "description": "Create a GitHub issue.", "input_schema": {"type": "object", "properties": {"title": {"type": "string"}, "body": {"type": "string"}, "labels": {"type": "array", "items": {"type": "string"}}}, "required": ["title", "body"]}},
+    {"name": "mcp__github__list_issues", "description": "List GitHub issues.", "input_schema": {"type": "object", "properties": {"state": {"type": "string"}}}},
+    {"name": "mcp__postgres__query", "description": "Run a SQL query.", "input_schema": {"type": "object", "properties": {"sql": {"type": "string"}}, "required": ["sql"]}},
+    {"name": "mcp__slack__send_message", "description": "Send a Slack message.", "input_schema": {"type": "object", "properties": {"channel": {"type": "string"}, "text": {"type": "string"}}, "required": ["channel", "text"]}},
+    {"name": "mcp__notion__create_page", "description": "Create a Notion page.", "input_schema": {"type": "object", "properties": {"parent": {"type": "string"}, "title": {"type": "string"}, "content": {"type": "string"}}, "required": ["parent", "title"]}}
+  ],
+  "messages": [
+    {"role": "user", "content": "Refactor the auth function in src/auth.py"}
+  ]
+}
