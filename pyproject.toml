@@ -1,6 +1,6 @@
 [project]
 name = "kagura-code"
-version = "0.1.0a4"
+version = "0.1.0a5"
 description = "Run Claude Code CLI against non-Anthropic LLM backends (Ollama Cloud, OpenAI-compatible, ...)"
 readme = "README.md"
 requires-python = ">=3.11"

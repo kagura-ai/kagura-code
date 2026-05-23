@@ -3,6 +3,31 @@
 All notable changes to this project will be documented here. The format
 follows [Keep a Changelog](https://keepachangelog.com/).
 
+## v0.1.0a5 — 2026-05-23
+
+**Router timeout 5s → 15s; document auth-mode and status-bar trade-offs
+in README.**
+
+Symptom (regression from ollama-code-era 5s budget): on the first turn
+of a session, `gemma4:31b-cloud` cold-start sometimes exceeds 5s,
+producing `router: HTTP error (ReadTimeout('')); falling back to full
+tool list`. The session continues fine (FALLBACK_ALL forwards the full
+catalog for that one turn), but the warning is noisy.
+
+Bumped `ToolRouter.timeout_s` default 5.0 → 15.0, mirrored in
+`MiddlewareManager.router_timeout_s` and `KAGURA_CODE_ROUTER_TIMEOUT`
+env-var fallback in `middleware.runner`. Override via
+`KAGURA_CODE_ROUTER_TIMEOUT=<seconds>` in the launching shell for
+slower paths.
+
+README adds a "Known trade-offs" section documenting:
+- Auth mode: `/model` picker (API billing) vs. claude.ai MCP
+  connectors (claude.ai session). Mutually exclusive; kagura-code
+  picks the latter by default.
+- Status bar `ctx` doesn't refresh on mid-session `/model` switch.
+  Relaunch with `--model <alias>` for honest display.
+- Router cold-start guidance and how to tune the timeout.
+
 ## v0.1.0a4 — 2026-05-23
 
 **`--list-models`: add `Recommended use` column; show Context/Max out

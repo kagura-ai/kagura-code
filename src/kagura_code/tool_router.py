@@ -42,8 +42,13 @@ class ToolRouter:
         proxy_url: str,
         router_model: str,
         master_key: str,
-        timeout_s: float = 5.0,
+        timeout_s: float = 15.0,
     ) -> None:
+        # 15s default: gemma4:31b-cloud cold-start (first call after deploy,
+        # or after idle queue eviction) routinely takes 8-12s end-to-end. The
+        # earlier 5s default produced visible `router: HTTP error (ReadTimeout(''))`
+        # warnings on the first turn of each session and a full-tool-list
+        # fallback for that request. Override via KAGURA_CODE_ROUTER_TIMEOUT.
         self.proxy_url = proxy_url.rstrip("/")
         self.router_model = router_model
         self.master_key = master_key  # LiteLLM proxy master key for Authorization header.

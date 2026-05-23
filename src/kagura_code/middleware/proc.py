@@ -41,7 +41,7 @@ class MiddlewareManager:
         proxy_url: str,
         router_model: str,
         master_key: str = "kagura-code-dummy",
-        router_timeout_s: float = 5.0,
+        router_timeout_s: float = 15.0,
         known_aliases: frozenset[str] = frozenset(),
         default_alias: str | None = None,
         summarizer_model: str | None = None,

@@ -63,6 +63,52 @@ exceptional, but you're locked to Anthropic's models and pricing. With
   capable one
 - Stay independent of API pricing changes from a single vendor
 
+## Known trade-offs
+
+### Auth mode: `/model` picker vs. claude.ai MCP connectors
+
+Claude Code behaves differently depending on whether `ANTHROPIC_AUTH_TOKEN`
+is set in the subprocess environment. `kagura-code` intentionally leaves it
+unset so that Claude Code uses the user's `claude.ai` session, which keeps
+the `/mcp` picker populated with claude.ai-hosted connectors (Gmail,
+Calendar, Drive, kagura-memory, …).
+
+The cost: in this mode Claude Code does **not** call `/v1/models` for
+gateway discovery, so the in-TUI `/model` picker only shows the launch
+model plus the built-in Anthropic aliases (`claude-opus-*`,
+`claude-sonnet-*`, …). To switch models mid-workflow you have to relaunch:
+
+```bash
+kagura-code --model claude-kimi-k2
+kagura-code --model claude-qwen3-coder
+kagura-code --model claude-deepseek-v4-pro   # default
+```
+
+Run `kagura-code --list-models` to see every configured alias with its
+context window, max output, and recommended use.
+
+If you'd rather have the in-TUI picker over the connectors, set
+`ANTHROPIC_AUTH_TOKEN=kagura-code-dummy` in your shell before launch —
+gateway discovery turns back on but the `/mcp` picker loses claude.ai
+connectors (local stdio MCP servers in `~/.claude.json` continue to work).
+
+### Status bar `ctx` doesn't update on `/model` switch
+
+`CLAUDE_CODE_MAX_CONTEXT_TOKENS` is read once at subprocess start. If you
+launch with the 1M-context DeepSeek and then switch to a 256K model via
+`/model`, the status bar will keep showing 1.0M. Relaunch with the
+target model via `--model` to get an honest display.
+
+### Router cold-start
+
+The first turn of each session calls the small router model
+(`claude-gemma4-31b` by default). Cold-start on Ollama Cloud can take
+~10s; we default the per-call timeout to 15s. On timeout the middleware
+falls back to forwarding the full tool catalog for that one turn — the
+session continues, just with a larger first request. Override the budget
+via `kagura-code --router-model <alias>` or
+`KAGURA_CODE_ROUTER_TIMEOUT=30` in the launching shell.
+
 ## License
 
 Apache License 2.0. See `LICENSE`.
