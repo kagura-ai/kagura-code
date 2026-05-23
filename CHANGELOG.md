@@ -3,6 +3,30 @@
 All notable changes to this project will be documented here. The format
 follows [Keep a Changelog](https://keepachangelog.com/).
 
+## v0.1.0a3 — 2026-05-23
+
+**Normalize `max_output_tokens` across tier-1 models.**
+
+The shipped defaults had DeepSeek V4 Pro (1M context) capped at 32K
+output while Qwen3 Coder (256K context) had 65K — a clear asymmetry
+inherited from incremental ollama-code config edits. The 1M context
+of DeepSeek was wasted by the 32K output ceiling, and users hit
+truncation on long writing/analysis tasks.
+
+Tier-1 (large reasoning/code) models now share `max_output_tokens = 65_536`:
+- `claude-deepseek-v4-pro`: 32K → **65K**
+- `claude-qwen3-coder`: 65K (unchanged)
+- `claude-kimi-k2`: 32K → **65K**
+
+Tier-2 (small / summarizer) unchanged:
+- `claude-gemma4-31b`: 8K
+- `claude-qwen35-summ`: 8K
+
+This only changes what `CLAUDE_CODE_MAX_OUTPUT_TOKENS` is set to for
+the launched claude subprocess — the actual output ceiling is still
+bounded by the model's native cap; raising the request limit just
+means Claude Code stops asking for an artificially low ceiling.
+
 ## v0.1.0a2 — 2026-05-23
 
 **Feature-complete alpha.** Phase 2 of the migration: all modules

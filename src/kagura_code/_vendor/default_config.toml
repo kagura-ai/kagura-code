@@ -32,7 +32,10 @@ ollama_model      = "deepseek-v4-pro:cloud"
 # user-prompt cap is lower (~62.5% pre-flight × ~95% daemon headroom — see
 # docs/verification.md for the per-model breakdown).
 context_window    = 1_048_576
-max_output_tokens = 32_768
+# max_output_tokens: tier-1 (large reasoning/code models) → 65,536. DeepSeek's
+# 1M context is wasted on 32K-output ceiling, and asymmetry with Qwen3 Coder
+# (which had 65K already) was confusing. Aligned to 65K for tier-1.
+max_output_tokens = 65_536
 
 [[models]]
 alias             = "claude-qwen3-coder"
@@ -46,7 +49,8 @@ alias             = "claude-kimi-k2"
 display_name      = "Kimi K2.6 [256K]"
 ollama_model      = "kimi-k2.6:cloud"
 context_window    = 262_144
-max_output_tokens = 32_768
+# Aligned to tier-1 65K (was 32K) for consistency with DeepSeek / Qwen3 Coder.
+max_output_tokens = 65_536
 
 [[models]]
 alias             = "claude-gemma4-31b"
