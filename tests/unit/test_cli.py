@@ -80,6 +80,28 @@ def test_explicit_model_flag_wins_over_positional(monkeypatch):
     assert captured["alias"] == "claude-qwen3-coder"
 
 
+def test_complete_model_returns_matching_aliases():
+    """`_complete_model(prefix)` lists configured aliases starting with the prefix."""
+    from kagura_code.cli import _complete_model
+
+    matches = _complete_model("claude-d")
+    assert "claude-deepseek-v4-pro" in matches
+    assert all(m.startswith("claude-d") for m in matches)
+
+    # Empty prefix returns the full set of configured aliases.
+    all_aliases = _complete_model("")
+    assert "claude-deepseek-v4-pro" in all_aliases
+    assert "claude-kimi-k2" in all_aliases
+
+
+def test_show_completion_exits_zero():
+    """Typer's --show-completion should print a script and exit cleanly."""
+    result = runner.invoke(app, ["--show-completion", "bash"])
+    assert result.exit_code == 0
+    # Sanity: the printed script mentions the program name somewhere.
+    assert "kagura" in result.stdout.lower() or "complete" in result.stdout.lower()
+
+
 def test_option_shaped_extras_not_parsed_as_model(monkeypatch):
     """Regression: `kagura-code --some-claude-flag` (no `--`) must not bind
     `--some-claude-flag` to the positional model_arg. The unknown option

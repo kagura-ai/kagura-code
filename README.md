@@ -103,7 +103,7 @@ and re-run until all 9 checks pass.
 
 ### Shell completion (optional)
 
-Tab-complete subcommands, flags, and configured model aliases:
+Tab-complete options/flags and configured model aliases:
 
 ```bash
 kagura-code --install-completion bash   # or: zsh, fish, powershell

@@ -22,7 +22,8 @@ appear too, since the callback runs `load_config()` at completion time.
 
 README "Quick start" gains a visible callout pointing to #6 for PyPI
 publication status, and the CLI reference grows entries for the new
-positional argument and the two completion subcommands.
+positional argument and the `--install-completion` / `--show-completion`
+options.
 
 ## v0.1.0a5 — 2026-05-23
 
