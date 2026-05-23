@@ -42,15 +42,113 @@ turn (full tool catalog runs ~50K tokens), forwards a filtered request to
 LiteLLM, and runs a background summarizer to keep the context window from
 overflowing.
 
+## Prerequisites
+
+`kagura-code` is a launcher — it spawns three things you must have installed
+locally:
+
+| Dependency | Why | How to install |
+|---|---|---|
+| Python ≥ 3.11 | The launcher itself | system package manager / pyenv / uv |
+| `claude` CLI | Claude Code TUI that we route | https://docs.claude.com/code |
+| `ollama` daemon | Cloud model gateway | https://ollama.com/download |
+
+Additionally, the Ollama daemon needs:
+
+1. **A signed-in cloud account** — `ollama signin` (once per machine). The
+   daemon handles cloud auth transparently for the proxy; no API key needs
+   to live in `kagura-code` config.
+2. **At least one `:cloud` model pulled** — for example:
+   ```bash
+   ollama pull deepseek-v4-pro:cloud   # default model
+   ollama pull qwen3.5:397b-cloud      # default summarizer
+   ```
+   See `kagura-code --list-models` after install for the full default set.
+
+Optional but recommended: **`rtk`** (Rust Token Killer) for 60-90% bash-tool
+token savings. `kagura-code --doctor` detects it and recommends installing
+if missing.
+
 ## Quick start
 
 ```bash
-pip install kagura-code  # not yet on PyPI
-kagura-code              # launches Claude Code against the default model
+# 1. Install (not yet on PyPI — install from GitHub for now)
+pip install git+https://github.com/kagura-ai/kagura-code.git@v0.1.0a5
+
+# 2. Verify environment
+kagura-code --doctor
+
+# 3. See available models
+kagura-code --list-models
+
+# 4. Launch a session (default: claude-deepseek-v4-pro, 1M context)
+kagura-code
+
+# Or pick a model explicitly:
+kagura-code --model claude-kimi-k2
+kagura-code --model claude-qwen3-coder
 ```
 
-Configuration lives in `~/.config/kagura-code/config.toml` (override the
-defaults shipped in the package).
+If `--doctor` reports a failed check, fix the underlying issue (install the
+missing binary, run `ollama serve`, run `ollama signin`, pull a cloud model)
+and re-run until all 9 checks pass.
+
+## Configuration
+
+The shipped defaults work out of the box. To override (e.g. add your own
+model alias, change the default, pin to a different Ollama daemon URL),
+create `~/.config/kagura-code/config.toml`. Only the keys you set override
+the shipped defaults; everything else inherits.
+
+Example minimal override (change the default model + add a custom alias):
+
+```toml
+[default]
+model = "claude-kimi-k2"
+
+[[models]]
+alias             = "claude-my-custom"
+display_name      = "My Custom Cloud Model"
+ollama_model      = "some-model:cloud"
+context_window    = 262_144
+max_output_tokens = 65_536
+recommended_use   = "My experimental setup"
+```
+
+Run `kagura-code --list-models` again to confirm the merged set.
+
+## CLI reference
+
+```
+kagura-code [OPTIONS] [-- claude-args...]
+
+Options:
+  -m, --model TEXT          Model alias to use (overrides default).
+      --list-models         List available models and exit.
+      --doctor              Run setup diagnostics and exit.
+      --proxy-only          Start the proxy without launching claude.
+      --config PATH         Explicit config.toml path.
+      --port INT            Pin proxy to a specific port (default: random).
+      --log-level [debug|info|warn|error]
+                            Default: warn.
+      --lean                Reduced-overhead session (no agents/skills/plugins/MCP, ~50K token savings).
+      --router-model TEXT   LiteLLM alias used as middleware router (default: claude-gemma4-31b).
+      --summarizer-model TEXT
+                            LiteLLM alias used for compression (default: claude-qwen35-summ).
+                            Pass "" to disable compression.
+  -V, --version             Show version and exit.
+
+Arguments after `--` are forwarded to the spawned `claude` process.
+```
+
+## Tunable env vars
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `KAGURA_CODE_CONFIG` | — | Path to user config.toml (overrides search path) |
+| `KAGURA_CODE_ROUTER_TIMEOUT` | `15.0` | Per-call seconds budget for the on-demand router model |
+| `KAGURA_CODE_SUMMARIZER_TIMEOUT` | `180.0` | Per-call seconds budget for the context summarizer |
+| `ANTHROPIC_AUTH_TOKEN` | unset | Set to any value to flip Claude Code into API billing mode (enables `/model` picker; loses claude.ai MCP connectors) |
 
 ## Why?
 
