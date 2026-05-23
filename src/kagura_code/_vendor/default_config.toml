@@ -1,0 +1,79 @@
+# Default config shipped with kagura-code.
+# User overrides go to ~/.config/kagura-code/config.toml.
+#
+# Auth note: kagura-code targets the local Ollama daemon by default,
+# which handles cloud model authentication transparently via
+# `ollama signin`. No API key is configured here. To use a remote
+# daemon, override api_base in your user config.
+#
+# Context-window note: the values below match what the local Ollama
+# daemon reports via `/api/show` for each model. Some upstream model
+# docs (e.g. Qwen3-Coder) advertise larger windows via extrapolation
+# methods, but those are not enabled in the cloud-served version, so
+# we use the daemon's real cap. deepseek-v4-pro is the only model in
+# the default set that genuinely serves 1M.
+
+[default]
+model = "claude-deepseek-v4-pro"
+
+[ollama_cloud]
+# Ollama daemon's native API root (no /v1 suffix).
+# We use LiteLLM's ollama_chat/ provider, which expects the native API
+# rather than the OpenAI-compatible /v1 endpoint, because we need to
+# pass num_ctx (an Ollama-specific param) per request.
+api_base = "http://localhost:11434"
+
+[[models]]
+alias             = "claude-deepseek-v4-pro"
+display_name      = "DeepSeek V4 Pro [1M]"
+ollama_model      = "deepseek-v4-pro:cloud"
+# context_window matches what the Ollama daemon reports via /api/show so the
+# Claude Code status bar shows the honest model capacity. Effective
+# user-prompt cap is lower (~62.5% pre-flight × ~95% daemon headroom — see
+# docs/verification.md for the per-model breakdown).
+context_window    = 1_048_576
+max_output_tokens = 32_768
+
+[[models]]
+alias             = "claude-qwen3-coder"
+display_name      = "Qwen3 Coder 480B [256K]"
+ollama_model      = "qwen3-coder:480b-cloud"
+context_window    = 262_144
+max_output_tokens = 65_536
+
+[[models]]
+alias             = "claude-kimi-k2"
+display_name      = "Kimi K2.6 [256K]"
+ollama_model      = "kimi-k2.6:cloud"
+context_window    = 262_144
+max_output_tokens = 32_768
+
+[[models]]
+alias             = "claude-gemma4-31b"
+display_name      = "Gemma 4 31B [256K]"
+ollama_model      = "gemma4:31b-cloud"
+context_window    = 262_144
+max_output_tokens = 8_192
+
+[[models]]
+alias             = "claude-qwen35-summ"
+display_name      = "Qwen3.5 397B [summarizer]"
+ollama_model      = "qwen3.5:397b-cloud"
+# Used as the default --summarizer-model. Also selectable as the main model
+# via `kagura-code --model claude-qwen35-summ`. context_window matches the
+# daemon /api/show value for qwen3.5:397b-cloud.
+#
+# Alias name avoids the `claude-{family}-{major}-{minor}` pattern that
+# LiteLLM uses for built-in Anthropic models (claude-opus-4-5,
+# claude-haiku-4-5, ...).  When the alias matches that pattern, LiteLLM
+# collapses it into a `*` wildcard entry in /v1/models output, breaking
+# Claude Code's /model picker enumeration (see v0.3.0a4 changelog).
+context_window    = 262_144
+max_output_tokens = 8_192
+
+[rtk]
+# Token-saving CLI proxy. If 'rtk' is on PATH, bash commands run by claude
+# can be rewritten through it for 60-90% token savings. The actual hook
+# config lives in ~/.claude/settings.json (global). kagura-code's --doctor
+# reports whether rtk is detected.
+enabled = "auto"   # auto | true | false (auto = detect via PATH)
