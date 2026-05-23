@@ -111,6 +111,15 @@ def main(
         ok = run_diagnostics(cfg, router_model=router_model)
         raise typer.Exit(0 if ok else 1)
 
+    # If the "positional" value actually looks like an option (starts with -),
+    # it's an unknown flag that click bound to model_arg because of
+    # ignore_unknown_options=True + the new Argument. Push it back into the
+    # forwarded args so `kagura-code --some-claude-flag` keeps working without
+    # requiring an explicit `--` separator (pre-positional-arg behavior).
+    if model_arg is not None and model_arg.startswith("-"):
+        ctx.args = [model_arg, *ctx.args]
+        model_arg = None
+
     # Resolve model: explicit --model wins over positional, then config default.
     selected_alias = model or model_arg or cfg.default_model
     try:
