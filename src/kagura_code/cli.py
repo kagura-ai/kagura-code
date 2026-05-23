@@ -282,20 +282,27 @@ def main(
 
 
 def _print_models(cfg: Config) -> None:
-    console = Console(width=120)
+    console = Console(width=130)
     t = Table(title="Available models")
     t.add_column("Alias")
     t.add_column("Display name")
-    t.add_column("Ollama model")
     t.add_column("Context", justify="right")
     t.add_column("Max out", justify="right")
+    t.add_column("Recommended use")
     for m in cfg.models:
         marker = " (default)" if m.alias == cfg.default_model else ""
+        ctx_str = (
+            f"{m.context_window / 1_048_576:.1f}M"
+            if m.context_window >= 1_048_576
+            else f"{m.context_window // 1024}K"
+        )
+        pct = round(m.max_output_tokens / m.context_window * 100)
+        max_out_str = f"{m.max_output_tokens // 1024}K ({pct}%)"
         t.add_row(
             m.alias + marker,
             m.display_name,
-            m.ollama_model,
-            f"{m.context_window:,}",
-            f"{m.max_output_tokens:,}",
+            ctx_str,
+            max_out_str,
+            m.recommended_use,
         )
     console.print(t)

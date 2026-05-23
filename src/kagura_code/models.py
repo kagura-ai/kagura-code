@@ -10,12 +10,17 @@ class ModelSpec:
 
     The `alias` must start with `claude-` so that Claude Code's gateway
     discovery filter accepts it.
+
+    `recommended_use` is a short, human-readable string displayed in
+    `kagura-code --list-models` to help users pick the right model for
+    a session. Empty string means no recommendation shown.
     """
     alias: str
     display_name: str
     ollama_model: str
     context_window: int
     max_output_tokens: int
+    recommended_use: str = ""
 
     def __post_init__(self) -> None:
         if not self.alias.startswith("claude-"):

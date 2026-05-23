@@ -136,6 +136,7 @@ def load_config(explicit_path: Path | None) -> Config:
                     ollama_model=entry["ollama_model"],
                     context_window=int(entry["context_window"]),
                     max_output_tokens=int(entry["max_output_tokens"]),
+                    recommended_use=str(entry.get("recommended_use", "")),
                 )
             )
         except (KeyError, ValueError, TypeError) as e:

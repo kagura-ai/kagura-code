@@ -36,6 +36,7 @@ context_window    = 1_048_576
 # 1M context is wasted on 32K-output ceiling, and asymmetry with Qwen3 Coder
 # (which had 65K already) was confusing. Aligned to 65K for tier-1.
 max_output_tokens = 65_536
+recommended_use   = "Long-context agentic, analysis"
 
 [[models]]
 alias             = "claude-qwen3-coder"
@@ -43,6 +44,7 @@ display_name      = "Qwen3 Coder 480B [256K]"
 ollama_model      = "qwen3-coder:480b-cloud"
 context_window    = 262_144
 max_output_tokens = 65_536
+recommended_use   = "Code generation, long writes"
 
 [[models]]
 alias             = "claude-kimi-k2"
@@ -51,6 +53,7 @@ ollama_model      = "kimi-k2.6:cloud"
 context_window    = 262_144
 # Aligned to tier-1 65K (was 32K) for consistency with DeepSeek / Qwen3 Coder.
 max_output_tokens = 65_536
+recommended_use   = "General agentic, tool-heavy"
 
 [[models]]
 alias             = "claude-gemma4-31b"
@@ -58,6 +61,7 @@ display_name      = "Gemma 4 31B [256K]"
 ollama_model      = "gemma4:31b-cloud"
 context_window    = 262_144
 max_output_tokens = 8_192
+recommended_use   = "Quick QA, lightweight tasks"
 
 [[models]]
 alias             = "claude-qwen35-summ"
@@ -74,6 +78,7 @@ ollama_model      = "qwen3.5:397b-cloud"
 # Claude Code's /model picker enumeration (see v0.3.0a4 changelog).
 context_window    = 262_144
 max_output_tokens = 8_192
+recommended_use   = "Context compression (internal)"
 
 [rtk]
 # Token-saving CLI proxy. If 'rtk' is on PATH, bash commands run by claude

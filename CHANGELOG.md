@@ -3,6 +3,36 @@
 All notable changes to this project will be documented here. The format
 follows [Keep a Changelog](https://keepachangelog.com/).
 
+## v0.1.0a4 — 2026-05-23
+
+**`--list-models`: add `Recommended use` column; show Context/Max out
+in human units with %.**
+
+The previous table had a verbose `Ollama model` column (e.g.
+`deepseek-v4-pro:cloud`) but no hint about which model to pick for
+which task. The new layout drops the redundant column and replaces
+the absolute token counts with human units plus the output/context
+ratio:
+
+```
+│ Alias                            │ Display name            │ Context │   Max out │ Recommended use                │
+│ claude-deepseek-v4-pro (default) │ DeepSeek V4 Pro [1M]    │    1.0M │  64K (6%) │ Long-context agentic, analysis │
+│ claude-qwen3-coder               │ Qwen3 Coder 480B [256K] │    256K │ 64K (25%) │ Code generation, long writes   │
+│ claude-kimi-k2                   │ Kimi K2.6 [256K]        │    256K │ 64K (25%) │ General agentic, tool-heavy    │
+│ claude-gemma4-31b                │ Gemma 4 31B [256K]      │    256K │   8K (3%) │ Quick QA, lightweight tasks    │
+│ claude-qwen35-summ               │ Qwen3.5 397B            │    256K │   8K (3%) │ Context compression (internal) │
+```
+
+Added `recommended_use: str = ""` field to `ModelSpec` (empty-string
+default preserves backward compat). User configs can override the
+recommendation per-alias.
+
+The shipped defaults categorize models by output ratio:
+
+- 5-10% → Agentic / Long-context (DeepSeek)
+- 20-25% → Code & Long-form (Qwen3 Coder, Kimi K2)
+- 3-5% → Quick / Lightweight + Summarizer (Gemma 4, Qwen3.5 summ)
+
 ## v0.1.0a3 — 2026-05-23
 
 **Normalize `max_output_tokens` across tier-1 models.**
